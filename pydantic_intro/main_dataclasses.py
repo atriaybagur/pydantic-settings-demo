@@ -15,7 +15,7 @@ class User:
     website: Optional[str] = None
 
     @staticmethod
-    def parse(payload: dict) -> "User":
+    def validate(payload: dict) -> "User":
         # manual type conversions
         name = str(payload["name"])
         email = str(payload["email"])
@@ -48,5 +48,5 @@ payload = {
     "age": "30",
     "website": "https://ada.com",
 }
-user = User.parse(payload)
+user = User.validate(payload)
 print(user)

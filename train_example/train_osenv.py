@@ -30,8 +30,8 @@ def main():
     print("🚀 Starting training (os.getenv approach)...")
     maybe_heavy_setup()
 
-    # We store raw strings from the environment and defer parsing
-    lr_raw = os.getenv("LEARNING_RATE", "0.001")
+    # We store raw strings from the environment and defer validation
+    lr_raw = os.getenv("LEARNING_RATE")
     api_key = os.getenv("API_KEY")  # may be None; we won't check yet
 
     # Simulate a long run before we finally use the values properly
@@ -41,9 +41,9 @@ def main():
         # We (badly) wait until epoch 3 to use the learning rate for a new optimizer
         if epoch == 3:
             print("⚙️  Rebuilding optimizer with LEARNING_RATE from env...")
-            # Now we finally parse the value; this can crash late
+            # Now we finally validate the value; this can crash late
             lr = float(lr_raw)  # ValueError if lr_raw isn't a float-like string
-            print(f"✅ Parsed learning rate: {lr}")
+            print(f"✅ Set learning rate: {lr}")
 
     # End-of-run logging that finally checks API_KEY
     print("🧾 Finalizing... pushing metrics")

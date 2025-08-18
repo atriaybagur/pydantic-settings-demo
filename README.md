@@ -13,29 +13,73 @@ curl -s http://127.0.0.1:8000/config | jq
 
 ## Demo commands
 
-Motivation:
+### Motivation
+
+This will assign `DEBUG` the default value, but will error as `MAX_CONNECTIONS` is not set to the environment.
 
 ```bash
 uv run uvicorn os_env_demo.main:app --reload
+```
+
+This will set `MAX_CONNECTIONS` to -1, which is invalid, and will raise ad-hoc error.
+
+```bash
 MAX_CONNECTIONS=-1 uv run uvicorn os_env_demo.main:app --reload
+```
+
+This will run with valid settings (also test endpoint):
+
+```bash
 MAX_CONNECTIONS=5 uv run uvicorn os_env_demo.main:app --reload
 ```
 
-Truthy value to DEBUG (actually evaluates to `false`):
+If we set a truthy value to `DEBUG` (e.g. `DEBUG=1`), it actually evaluates to `false`.
 
 ```bash
 DEBUG=1 MAX_CONNECTIONS=5 uv run uvicorn os_env_demo.main:app --reload
 ```
 
-Pydantic-settings base
+### Pydantic intro
+
+If you want to create a dataclass with input validation, you might do something like this:
+
+```bash
+uv run pydantic_intro/main_dataclasses.py
+```
+
+Pydantic allows you to define a class with type annotations, and it will validate the input data against those types:
+
+```bash
+uv run pydantic_intro/main_pydantic.py
+```
+
+### Pydantic-settings (base)
+
+This will assign `DEBUG` the default value, but will error as `MAX_CONNECTIONS` is (required and) not set to the environment. The validation error will be a Pydantic built-in.
 
 ```bash
 uv run uvicorn pydantic_settings_base.main:app --reload
+```
+
+This will set `MAX_CONNECTIONS` to -1, which is invalid, and will raise a Pydantic validation error.
+
+```bash
 MAX_CONNECTIONS=-1 uv run uvicorn pydantic_settings_base.main:app --reload
+```
+
+This will run with valid settings (also test endpoint):
+
+```bash
 MAX_CONNECTIONS=5 uv run uvicorn pydantic_settings_base.main:app --reload
 ```
 
-Pydantic-settings with env file
+If we set a truthy value to `DEBUG`, it will be evaluated correctly:
+
+```bash
+DEBUG=1 MAX_CONNECTIONS=5 uv run uvicorn pydantic_settings_base.main:app --reload
+```
+
+### Pydantic-settings (read from .env file)
 
 ```bash
 uv run uvicorn pydantic_settings_env_file.main:app --reload
@@ -47,27 +91,31 @@ Note pydantic-settings uses the same priority rule as python-dotenv by default: 
 MAX_CONNECTIONS=-1 uv run uvicorn pydantic_settings_env_file.main:app --reload
 ```
 
-Pydantic-settings with more types
+### Pydantic-settings (with more types)
 
 ```bash
 uv run uvicorn pydantic_settings_more_types.main:app --reload
 ```
 
-Try date in the past and use reload to see validation error
+Try date in the past and use the reload feature to see validation error.
 
-Pydantic-settings with persistence
+### Pydantic-settings (persist config)
+
+```bash
+uv run uvicorn pydantic_settings_persist.main:app --reload
+```
 
 ## Training example
 
-###  `os.getenv()`
+### `os.getenv()`
 
 ```bash
-# BAD lr value; app runs for ~3 epochs and then crashes late
+# Invalid learning rate value; app runs for ~3 epochs and then crashes
 LEARNING_RATE=fast uv run python train_example/train_osenv.py
 ```
 
 ```bash
-# Valid LR but missing API key; late failure during final logging
+# Valid learning rate but missing API key; even later failure during final logging
 LEARNING_RATE=0.001 uv run python train_example/train_osenv.py
 ```
 

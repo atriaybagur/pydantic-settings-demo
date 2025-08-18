@@ -18,4 +18,5 @@ user = User(
     age=30,
     website="https://alice.com",
 )
-print(user.model_dump())
+print(user)  # Print the user object
+print(user.model_dump())  # Serialise output

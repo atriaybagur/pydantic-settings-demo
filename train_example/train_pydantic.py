@@ -1,13 +1,16 @@
 import random
 import time
 
-from pydantic import PositiveFloat, SecretStr, ValidationError
+from pydantic import PositiveFloat, SecretStr
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     learning_rate: PositiveFloat  # must be > 0
     api_key: SecretStr  # required
+
+
+settings = Settings()
 
 
 def maybe_heavy_setup():
@@ -27,19 +30,18 @@ def log_to_service(api_key: SecretStr, metrics: dict):
 
 def main():
     print("🚀 Starting training (pydantic-settings, fail-fast)...")
-    try:
-        # VALIDATES IMMEDIATELY at startup (fail-fast)
-        settings = Settings()
-    except ValidationError as e:
-        print("❌ Configuration error at startup — refusing to train:")
-        print(e)
-        return
-
     maybe_heavy_setup()
 
-    for epoch in range(1, 4):
+    # Simulate a long run
+    for epoch in range(1, 7):
         train_one_epoch(epoch)
 
+        # We wait until epoch 3 to use the learning rate for a new optimizer
+        if epoch == 3:
+            print("⚙️  Rebuilding optimizer with LEARNING_RATE from env...")
+            print(f"✅ Set learning rate: {settings.learning_rate}")
+
+    # End-of-run logging with API_KEY
     print("🧾 Finalizing... pushing metrics")
     log_to_service(settings.api_key, {"final_loss": random.random()})
     print("🎉 Training completed successfully")
